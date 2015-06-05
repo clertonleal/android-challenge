@@ -1,0 +1,6 @@
+SimpleFlickr/.gradle
+SimpleFlickr/local.properties
+SimpleFlickr/.idea
+*.iml
+.DS_Store
+SimpleFlickr/build

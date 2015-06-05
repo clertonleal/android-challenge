@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gray_comments">#393939</color>
+    <color name="loading_background">#c8ffffff</color>
+    <color name="primary_color">#283593</color>
+    <color name="primary_color_dark">#1A237E</color>
+    <color name="accent">#283593</color>
+    <color name="background_screen">#27282A</color>
+</resources>
