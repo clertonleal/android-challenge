@@ -104,7 +104,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadNewPage(int pageNumber) {
-        compositeSubscription.add(flickrService.retrievePage(pageNumber).
+        compositeSubscription.add(flickrService.retrievePopularPhotos(pageNumber).
                 observeOn(AndroidSchedulers.mainThread()).
                 subscribe(page -> {
                     showEmptyView(false);

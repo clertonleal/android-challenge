@@ -2,6 +2,8 @@ package clertonleal.com.simpleflickr.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -13,13 +15,13 @@ import javax.inject.Inject;
 
 import butterknife.InjectView;
 import clertonleal.com.simpleflickr.R;
+import clertonleal.com.simpleflickr.adapter.CommentsAdapter;
 import clertonleal.com.simpleflickr.entity.Comment;
 import clertonleal.com.simpleflickr.entity.PhotoDetails;
 import clertonleal.com.simpleflickr.service.FlickrService;
 import clertonleal.com.simpleflickr.util.BundleKeys;
 import clertonleal.com.simpleflickr.util.FlickrPicasso;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 
 public class PhotoActivity extends BaseActivity {
 
@@ -41,8 +43,16 @@ public class PhotoActivity extends BaseActivity {
     @InjectView(R.id.text_photo_title)
     TextView textPhotoTitle;
 
+    @InjectView(R.id.list)
+    RecyclerView recyclerView;
+
     @Inject
     FlickrService flickrService;
+
+    @Inject
+    CommentsAdapter adapter;
+
+    LinearLayoutManager linearLayoutManager;
 
     @Override
     protected void setContentView() {
@@ -53,6 +63,8 @@ public class PhotoActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String photoId = getBundle().getString(BundleKeys.PHOTO_ID);
+        configureRecycleView();
+
         compositeSubscription.add(flickrService.retrievePhoto(photoId).
                 observeOn(AndroidSchedulers.mainThread()).
                 subscribe(photo -> {
@@ -65,8 +77,15 @@ public class PhotoActivity extends BaseActivity {
                 subscribe(this::showComments));
     }
 
+    private void configureRecycleView() {
+        recyclerView.setHasFixedSize(true);
+        linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(adapter);
+    }
+
     private void showComments(List<Comment> comments) {
-        log(new Exception());
+        adapter.addComments(comments);
     }
 
     private void showPhoto(PhotoDetails photo) {

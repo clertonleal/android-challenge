@@ -21,8 +21,13 @@ public class FlickrService {
     @Inject
     public FlickrService() {}
 
-    public Observable<Page> retrievePage(Integer page) {
+    public Observable<Page> retrieveRecentPhotos(Integer page) {
         return flickrNetwork.retrievePage("flickr.photos.getRecent", Flickr.API_KEY, "json", 1, page).
+                map(PageWrapper::getPhotos);
+    }
+
+    public Observable<Page> retrievePopularPhotos(Integer page) {
+        return flickrNetwork.retrievePage("flickr.interestingness.getList", Flickr.API_KEY, "json", 1, page).
                 map(PageWrapper::getPhotos);
     }
 
