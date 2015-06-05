@@ -3,11 +3,12 @@ package clertonleal.com.simpleflickr.activity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.malinskiy.superrecyclerview.SuperRecyclerView;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class PhotoActivity extends BaseActivity {
     TextView textPhotoTitle;
 
     @InjectView(R.id.list)
-    RecyclerView recyclerView;
+    SuperRecyclerView recyclerView;
 
     @Inject
     FlickrService flickrService;
@@ -78,13 +79,12 @@ public class PhotoActivity extends BaseActivity {
     }
 
     private void configureRecycleView() {
-        recyclerView.setHasFixedSize(true);
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(adapter);
     }
 
     private void showComments(List<Comment> comments) {
+        recyclerView.setAdapter(adapter);
         adapter.addComments(comments);
     }
 
