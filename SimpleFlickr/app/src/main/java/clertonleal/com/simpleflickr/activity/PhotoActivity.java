@@ -1,10 +1,12 @@
 package clertonleal.com.simpleflickr.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -70,10 +72,19 @@ public class PhotoActivity extends BaseActivity {
                 subscribe(photo -> {
                     showPhoto(photo);
                     configureToolbar(photo);
+                    setClickListeners(photo);
                 }));
 
         compositeSubscription.add(flickrService.retrieveComments(photoId).
                 subscribe(this::showComments));
+    }
+
+    private void setClickListeners(PhotoDetails photo) {
+        imagePhoto.setOnClickListener(v -> {
+            Intent intent = new Intent(this, PhotoZoomActivity.class);
+            intent.putExtra(BundleKeys.PHOTO_URL, photo.getPhotoUrl());
+            startActivity(intent);
+        });
     }
 
     private void configureRecycleView() {

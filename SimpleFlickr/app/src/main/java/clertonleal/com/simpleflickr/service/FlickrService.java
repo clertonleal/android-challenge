@@ -11,6 +11,7 @@ import clertonleal.com.simpleflickr.entity.PhotoDetails;
 import clertonleal.com.simpleflickr.entity.PhotoWrapper;
 import clertonleal.com.simpleflickr.network.FlickrNetwork;
 import clertonleal.com.simpleflickr.util.Flickr;
+import clertonleal.com.simpleflickr.util.FlickrPhotos;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 
@@ -21,6 +22,14 @@ public class FlickrService {
 
     @Inject
     public FlickrService() {}
+
+    public Observable<Page> retrievePhotosByType(Integer page, FlickrPhotos flickrPhotos) {
+        if (flickrPhotos == FlickrPhotos.POPULARS) {
+            return retrievePopularPhotos(page);
+        } else {
+            return retrieveRecentPhotos(page);
+        }
+    }
 
     public Observable<Page> retrieveRecentPhotos(Integer page) {
         return flickrNetwork.retrievePage("flickr.photos.getRecent", Flickr.API_KEY, "json", 1, Flickr.PHOTOS_PER_PAGE, page).

@@ -13,8 +13,7 @@
         android:layout_height="250dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/dribbble_loading"
-        android:contentDescription="@string/dribble_image" />
+        android:src="@drawable/dribbble_loading" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -27,7 +26,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:singleLine="true"
-            android:text="@string/tittle_test"
             android:gravity="center_vertical"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"

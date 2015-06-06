@@ -15,8 +15,7 @@ import clertonleal.com.simpleflickr.R;
 import clertonleal.com.simpleflickr.adapter.holder.PhotoHolder;
 import clertonleal.com.simpleflickr.entity.Page;
 import clertonleal.com.simpleflickr.entity.Photo;
-import clertonleal.com.simpleflickr.listeners.OnPageLoadListener;
-import clertonleal.com.simpleflickr.listeners.OnShotClickListener;
+import clertonleal.com.simpleflickr.listeners.OnPhotoClickListener;
 import clertonleal.com.simpleflickr.util.FlickrPicasso;
 
 public class PhotoAdapter extends android.support.v7.widget.RecyclerView.Adapter<PhotoHolder> {
@@ -31,7 +30,7 @@ public class PhotoAdapter extends android.support.v7.widget.RecyclerView.Adapter
     LayoutInflater layoutInflater;
 
     private final List<Photo> photos = new ArrayList<>();
-    private OnShotClickListener onShotClickListener;
+    private OnPhotoClickListener onPhotoClickListener;
 
     @Inject
     public PhotoAdapter() {}
@@ -44,7 +43,7 @@ public class PhotoAdapter extends android.support.v7.widget.RecyclerView.Adapter
     @Override
     public void onBindViewHolder(PhotoHolder holder, int position) {
         Photo photo = photos.get(position);
-        holder.onShotClickListener = onShotClickListener;
+        holder.onPhotoClickListener = onPhotoClickListener;
         holder.photo = photo;
         FlickrPicasso.with(context, photo.getPhotoUrl()).into(holder.dribbbleImage);
         holder.dribbbleTittle.setText(photo.getTitle());
@@ -65,7 +64,7 @@ public class PhotoAdapter extends android.support.v7.widget.RecyclerView.Adapter
         this.photos.clear();
     }
 
-    public void setOnShotClickListener(OnShotClickListener onShotClickListener) {
-        this.onShotClickListener = onShotClickListener;
+    public void setOnPhotoClickListener(OnPhotoClickListener onPhotoClickListener) {
+        this.onPhotoClickListener = onPhotoClickListener;
     }
 }

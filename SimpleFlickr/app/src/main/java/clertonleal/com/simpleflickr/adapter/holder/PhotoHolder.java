@@ -8,21 +8,21 @@ import android.widget.TextView;
 
 import clertonleal.com.simpleflickr.R;
 import clertonleal.com.simpleflickr.entity.Photo;
-import clertonleal.com.simpleflickr.listeners.OnShotClickListener;
+import clertonleal.com.simpleflickr.listeners.OnPhotoClickListener;
 
 public class PhotoHolder extends RecyclerView.ViewHolder {
 
     public ImageView dribbbleImage;
     public TextView dribbbleTittle;
     public LinearLayout layoutProgress;
-    public OnShotClickListener onShotClickListener;
+    public OnPhotoClickListener onPhotoClickListener;
     public Photo photo;
 
     public PhotoHolder(View itemView) {
         super(itemView);
         itemView.setOnClickListener(v -> {
-            if (onShotClickListener != null) {
-                onShotClickListener.click(photo);
+            if (onPhotoClickListener != null) {
+                onPhotoClickListener.click(photo);
             }
         });
         dribbbleImage = (ImageView) itemView.findViewById(R.id.image_photo);

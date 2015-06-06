@@ -3,7 +3,7 @@ package clertonleal.com.simpleflickr.listeners;
 
 import clertonleal.com.simpleflickr.entity.Photo;
 
-public interface OnShotClickListener {
+public interface OnPhotoClickListener {
 
     void click(Photo photo);
 

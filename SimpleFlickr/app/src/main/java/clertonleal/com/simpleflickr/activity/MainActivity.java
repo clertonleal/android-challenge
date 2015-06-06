@@ -2,7 +2,6 @@ package clertonleal.com.simpleflickr.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.malinskiy.superrecyclerview.OnMoreListener;
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
 
 import javax.inject.Inject;
@@ -21,7 +19,7 @@ import clertonleal.com.simpleflickr.adapter.PhotoAdapter;
 import clertonleal.com.simpleflickr.service.ConnectionService;
 import clertonleal.com.simpleflickr.service.FlickrService;
 import clertonleal.com.simpleflickr.util.BundleKeys;
-import rx.android.schedulers.AndroidSchedulers;
+import clertonleal.com.simpleflickr.util.FlickrPhotos;
 
 public class MainActivity extends BaseActivity {
 
@@ -49,6 +47,8 @@ public class MainActivity extends BaseActivity {
     LinearLayoutManager linearLayoutManager;
 
     int actualPage = 1;
+
+    FlickrPhotos flickrPhotos = FlickrPhotos.POPULARS;
 
     @Override
     protected void setContentView() {
@@ -79,7 +79,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void configureToolbar() {
-        toolbar.inflateMenu(R.menu.home_menu);
+        toolbar.inflateMenu(R.menu.main_menu);
         toolbar.setTitle(R.string.app_name);
     }
 
@@ -93,7 +93,7 @@ public class MainActivity extends BaseActivity {
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         imageRefresh.setOnClickListener(v -> resetShots());
 
-        photoAdapter.setOnShotClickListener(photo -> {
+        photoAdapter.setOnPhotoClickListener(photo -> {
             final Intent intent = new Intent(this, PhotoActivity.class);
             intent.putExtra(BundleKeys.PHOTO_ID, photo.getId());
             startActivity(intent);
@@ -101,7 +101,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadInitialPage() {
-        compositeSubscription.add(flickrService.retrieveRecentPhotos(1).
+        compositeSubscription.add(flickrService.retrievePopularPhotos(1).
                 subscribe(page -> {
                     showEmptyView(false);
                     photoAdapter.addPagePhotos(page);
@@ -110,7 +110,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadNewPage(int pageNumber) {
-        compositeSubscription.add(flickrService.retrieveRecentPhotos(pageNumber).
+        compositeSubscription.add(flickrService.retrievePhotosByType(pageNumber, flickrPhotos).
                 subscribe(page -> {
                     recyclerView.hideMoreProgress();
                     photoAdapter.addPagePhotos(page);
@@ -118,9 +118,14 @@ public class MainActivity extends BaseActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
+        if (item.getItemId() == R.id.action_show_popular) {
+            flickrPhotos = FlickrPhotos.POPULARS;
+            resetShots();
+        } else if (item.getItemId() == R.id.action_show_news) {
+            flickrPhotos = FlickrPhotos.NEWS;
             resetShots();
         }
+
         return super.onOptionsItemSelected(item);
     }
 
