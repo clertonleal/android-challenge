@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +18,6 @@ import clertonleal.com.simpleflickr.adapter.holder.PhotoHolder;
 import clertonleal.com.simpleflickr.entity.Page;
 import clertonleal.com.simpleflickr.entity.Photo;
 import clertonleal.com.simpleflickr.listeners.OnPhotoClickListener;
-import clertonleal.com.simpleflickr.util.FlickrPicasso;
 
 public class PhotoAdapter extends android.support.v7.widget.RecyclerView.Adapter<PhotoHolder> {
 
@@ -45,7 +46,7 @@ public class PhotoAdapter extends android.support.v7.widget.RecyclerView.Adapter
         Photo photo = photos.get(position);
         holder.onPhotoClickListener = onPhotoClickListener;
         holder.photo = photo;
-        FlickrPicasso.with(context, photo.getPhotoUrl()).into(holder.dribbbleImage);
+        Picasso.with(context).load(photo.getPhotoUrl()).placeholder(R.drawable.photo_holder).into(holder.dribbbleImage);
         holder.dribbbleTittle.setText(photo.getTitle());
         holder.layoutProgress.setVisibility(View.GONE);
     }

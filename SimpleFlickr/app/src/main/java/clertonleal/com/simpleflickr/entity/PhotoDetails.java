@@ -96,4 +96,8 @@ public class PhotoDetails {
         return "https://farm" + getFarm() + ".staticflickr.com/" + getServer() +"/" + getId() + "_" + getSecret() + ".jpg";
     }
 
+    public String getLargePhotoUrl() {
+        return "https://farm" + getFarm() + ".staticflickr.com/" + getServer() +"/" + getId() + "_" + getSecret() + "_b" + ".jpg";
+    }
+
 }

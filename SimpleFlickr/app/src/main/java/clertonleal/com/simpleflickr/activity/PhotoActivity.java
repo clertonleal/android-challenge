@@ -8,9 +8,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.malinskiy.superrecyclerview.SuperRecyclerView;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -23,8 +26,6 @@ import clertonleal.com.simpleflickr.entity.Comment;
 import clertonleal.com.simpleflickr.entity.PhotoDetails;
 import clertonleal.com.simpleflickr.service.FlickrService;
 import clertonleal.com.simpleflickr.util.BundleKeys;
-import clertonleal.com.simpleflickr.util.FlickrPicasso;
-import rx.android.schedulers.AndroidSchedulers;
 
 public class PhotoActivity extends BaseActivity {
 
@@ -49,6 +50,9 @@ public class PhotoActivity extends BaseActivity {
     @InjectView(R.id.list)
     SuperRecyclerView recyclerView;
 
+    @InjectView(R.id.layout_photo)
+    LinearLayout layoutPhoto;
+
     @Inject
     FlickrService flickrService;
 
@@ -67,22 +71,29 @@ public class PhotoActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         String photoId = getBundle().getString(BundleKeys.PHOTO_ID);
         configureRecycleView();
+        layoutPhoto.setVisibility(View.GONE);
 
         compositeSubscription.add(flickrService.retrievePhoto(photoId).
                 subscribe(photo -> {
                     showPhoto(photo);
                     configureToolbar(photo);
                     setClickListeners(photo);
-                }));
+                    layoutPhoto.setVisibility(View.VISIBLE);
+                }, this::onError));
 
         compositeSubscription.add(flickrService.retrieveComments(photoId).
-                subscribe(this::showComments));
+                subscribe(this::showComments, this::onError));
+    }
+
+    private void onError(Throwable throwable) {
+        Toast.makeText(this, R.string.need_internet_to_see_photos, Toast.LENGTH_LONG).show();
+        finish();
     }
 
     private void setClickListeners(PhotoDetails photo) {
         imagePhoto.setOnClickListener(v -> {
             Intent intent = new Intent(this, PhotoZoomActivity.class);
-            intent.putExtra(BundleKeys.PHOTO_URL, photo.getPhotoUrl());
+            intent.putExtra(BundleKeys.PHOTO_URL, photo.getLargePhotoUrl());
             startActivity(intent);
         });
     }
@@ -95,12 +106,13 @@ public class PhotoActivity extends BaseActivity {
     private void showComments(List<Comment> comments) {
         recyclerView.setAdapter(adapter);
         adapter.addComments(comments);
+        layoutPhoto.setVisibility(View.VISIBLE);
     }
 
     private void showPhoto(PhotoDetails photo) {
-        FlickrPicasso.with(this, photo.getPhotoUrl()).into(imagePhoto);
+        Picasso.with(this).load(photo.getPhotoUrl()).placeholder(R.drawable.photo_holder).into(imagePhoto);
         textPhotoTitle.setText(photo.getTitle().getContent());
-        FlickrPicasso.with(this, photo.getOwner().getProfileIconUrl()).into(imageProfile);
+        Picasso.with(this).load(photo.getOwner().getProfileIconUrl()).placeholder(R.drawable.ic_camera).into(imageProfile);
         textAuthorName.setText(photo.getOwner().getUserName());
         textNumberComments.setText(photo.getComments().getContent() + " " + getResources().getString(R.string.comments));
     }

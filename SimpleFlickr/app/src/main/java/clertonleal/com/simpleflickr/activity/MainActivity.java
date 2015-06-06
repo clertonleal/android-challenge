@@ -89,9 +89,12 @@ public class MainActivity extends BaseActivity {
             loadNewPage(actualPage);
         }, 10);
 
-        recyclerView.setRefreshListener(this::resetShots);
+        recyclerView.setRefreshListener(this::loadInitialPage);
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
-        imageRefresh.setOnClickListener(v -> resetShots());
+        imageRefresh.setOnClickListener(v -> {
+            showEmptyView(false);
+            loadInitialPage();
+        });
 
         photoAdapter.setOnPhotoClickListener(photo -> {
             final Intent intent = new Intent(this, PhotoActivity.class);
@@ -101,9 +104,11 @@ public class MainActivity extends BaseActivity {
     }
 
     private void loadInitialPage() {
-        compositeSubscription.add(flickrService.retrievePopularPhotos(1).
+        actualPage = 1;
+        photoAdapter.cleanShots();
+        recyclerView.showProgress();
+        compositeSubscription.add(flickrService.retrievePhotosByType(actualPage, flickrPhotos).
                 subscribe(page -> {
-                    showEmptyView(false);
                     photoAdapter.addPagePhotos(page);
                     recyclerView.setAdapter(photoAdapter);
                 }, this::log));
@@ -120,20 +125,15 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_show_popular) {
             flickrPhotos = FlickrPhotos.POPULARS;
-            resetShots();
+            loadInitialPage();
         } else if (item.getItemId() == R.id.action_show_news) {
             flickrPhotos = FlickrPhotos.NEWS;
-            resetShots();
+            loadInitialPage();
+        } else if (item.getItemId() == R.id.action_refresh) {
+            loadInitialPage();
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void resetShots() {
-        photoAdapter.cleanShots();
-        linearLayoutManager.scrollToPosition(0);
-        actualPage = 1;
-        loadNewPage(actualPage);
     }
 
     private void configureRecycleView() {

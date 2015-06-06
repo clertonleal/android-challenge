@@ -2,8 +2,12 @@ package clertonleal.com.simpleflickr.adapter;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +17,6 @@ import javax.inject.Inject;
 import clertonleal.com.simpleflickr.R;
 import clertonleal.com.simpleflickr.adapter.holder.CommentHolder;
 import clertonleal.com.simpleflickr.entity.Comment;
-import clertonleal.com.simpleflickr.util.FlickrPicasso;
 
 public class CommentsAdapter extends android.support.v7.widget.RecyclerView.Adapter<CommentHolder> {
 
@@ -39,9 +42,9 @@ public class CommentsAdapter extends android.support.v7.widget.RecyclerView.Adap
     @Override
     public void onBindViewHolder(CommentHolder holder, int position) {
         Comment comment = comments.get(position);
-        FlickrPicasso.with(context, comment.getProfileIconUrl()).into(holder.imageAvatar);
+        Picasso.with(context).load(comment.getProfileIconUrl()).placeholder(R.drawable.ic_camera).into(holder.imageAvatar);
         holder.textAuthor.setText(comment.getAuthorName());
-        holder.textComment.setText(comment.getContent());
+        holder.textComment.setText(Html.fromHtml(comment.getContent()));
     }
 
     @Override

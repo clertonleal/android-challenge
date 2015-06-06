@@ -12,8 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/dribbble_loading" />
+        android:scaleType="centerCrop" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -30,6 +29,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:textSize="15sp"
+            android:maxLines="1"
             android:textColor="@android:color/white"/>
 
     </RelativeLayout>

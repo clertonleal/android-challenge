@@ -68,4 +68,8 @@ public class Photo implements Serializable {
     public String getPhotoUrl() {
         return "https://farm" + getFarm() + ".staticflickr.com/" + getServer() +"/" + getId() + "_" + getSecret() + ".jpg";
     }
+
+    public String getLargePhotoUrl() {
+        return "https://farm" + getFarm() + ".staticflickr.com/" + getServer() +"/" + getId() + "_" + getSecret() + "_b" + ".jpg";
+    }
 }
