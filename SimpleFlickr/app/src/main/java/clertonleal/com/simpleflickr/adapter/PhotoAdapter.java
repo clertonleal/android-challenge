@@ -31,8 +31,6 @@ public class PhotoAdapter extends android.support.v7.widget.RecyclerView.Adapter
     LayoutInflater layoutInflater;
 
     private final List<Photo> photos = new ArrayList<>();
-    private Page lastPage;
-    private OnPageLoadListener pageLoadListener;
     private OnShotClickListener onShotClickListener;
 
     @Inject
@@ -45,45 +43,25 @@ public class PhotoAdapter extends android.support.v7.widget.RecyclerView.Adapter
 
     @Override
     public void onBindViewHolder(PhotoHolder holder, int position) {
-        if (position < photos.size()) {
-            Photo photo = photos.get(position);
-            holder.onShotClickListener = onShotClickListener;
-            holder.photo = photo;
-            FlickrPicasso.with(context, photo.getPhotoUrl()).into(holder.dribbbleImage);
-            holder.dribbbleTittle.setText(photo.getTitle());
-            holder.layoutProgress.setVisibility(View.GONE);
-        } else {
-            holder.onShotClickListener = null;
-            holder.dribbbleImage.setImageResource(R.drawable.dribbble_loading);
-            holder.dribbbleTittle.setText(resources.getString(R.string.loading));
-            holder.layoutProgress.setVisibility(View.VISIBLE);
-            if (pageLoadListener != null && lastPage != null) {
-                pageLoadListener.loadPage(lastPage.getPage() + 1);
-            }
-        }
+        Photo photo = photos.get(position);
+        holder.onShotClickListener = onShotClickListener;
+        holder.photo = photo;
+        FlickrPicasso.with(context, photo.getPhotoUrl()).into(holder.dribbbleImage);
+        holder.dribbbleTittle.setText(photo.getTitle());
+        holder.layoutProgress.setVisibility(View.GONE);
     }
 
     @Override
     public int getItemCount() {
-        if (photos.isEmpty()) {
-            return 0;
-        } else {
-            return photos.size() + 1;
-        }
+        return photos.size();
     }
 
     public void addPagePhotos(Page newPage) {
         this.photos.addAll(newPage.getPhoto());
-        this.lastPage = newPage;
         notifyDataSetChanged();
     }
 
-    public void setPageLoadListener(OnPageLoadListener pageLoadListener) {
-        this.pageLoadListener = pageLoadListener;
-    }
-
     public void cleanShots() {
-        this.lastPage = null;
         this.photos.clear();
     }
 

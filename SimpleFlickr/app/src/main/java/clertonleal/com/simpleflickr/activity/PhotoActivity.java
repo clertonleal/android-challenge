@@ -67,14 +67,12 @@ public class PhotoActivity extends BaseActivity {
         configureRecycleView();
 
         compositeSubscription.add(flickrService.retrievePhoto(photoId).
-                observeOn(AndroidSchedulers.mainThread()).
                 subscribe(photo -> {
                     showPhoto(photo);
                     configureToolbar(photo);
                 }));
 
         compositeSubscription.add(flickrService.retrieveComments(photoId).
-                observeOn(AndroidSchedulers.mainThread()).
                 subscribe(this::showComments));
     }
 

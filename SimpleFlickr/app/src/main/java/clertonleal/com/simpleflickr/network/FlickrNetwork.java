@@ -16,6 +16,7 @@ public interface FlickrNetwork {
                                      @Query("api_key") String apiKey,
                                      @Query("format") String format,
                                      @Query("nojsoncallback") Integer jsonCallback,
+                                     @Query("per_page") Integer perPage,
                                      @Query("page") Integer page);
 
 

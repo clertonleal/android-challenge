@@ -59,11 +59,11 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/list"
             android:scrollbars="vertical"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"
             app:layout_empty="@layout/empty_view"
             app:layout_moreProgress="@layout/view_more_progress"
-            app:mainLayoutId="@layout/layout_recyclerview_verticalscroll"
-            android:layout_height="match_parent"/>
+            app:mainLayoutId="@layout/layout_recyclerview_verticalscroll"/>
 
     </LinearLayout>
 </LinearLayout>

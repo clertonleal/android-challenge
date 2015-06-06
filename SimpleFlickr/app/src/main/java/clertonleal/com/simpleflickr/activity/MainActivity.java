@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.malinskiy.superrecyclerview.OnMoreListener;
+import com.malinskiy.superrecyclerview.SuperRecyclerView;
 
 import javax.inject.Inject;
 
@@ -24,13 +26,10 @@ import rx.android.schedulers.AndroidSchedulers;
 public class MainActivity extends BaseActivity {
 
     @InjectView(R.id.list)
-    RecyclerView recyclerView;
+    SuperRecyclerView recyclerView;
 
     @InjectView(R.id.toolbar)
     Toolbar toolbar;
-
-    @InjectView(R.id.swipe_container)
-    SwipeRefreshLayout refreshLayout;
 
     @InjectView(R.id.layout_empty_view)
     LinearLayout emptyView;
@@ -49,6 +48,8 @@ public class MainActivity extends BaseActivity {
 
     LinearLayoutManager linearLayoutManager;
 
+    int actualPage = 1;
+
     @Override
     protected void setContentView() {
         setContentView(R.layout.activity_main);
@@ -61,8 +62,7 @@ public class MainActivity extends BaseActivity {
         configureToolbar();
         setListeners();
         if (connectionService.hasConnection()) {
-            showProgressDialog(R.string.loading_shots);
-            loadNewPage(1);
+            loadInitialPage();
         } else {
             showEmptyView(true);
         }
@@ -84,8 +84,12 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setListeners() {
-        photoAdapter.setPageLoadListener(this::loadNewPage);
-        refreshLayout.setOnRefreshListener(this::resetShots);
+        recyclerView.setupMoreListener((int numberOfItems, int numberBeforeMore, int currentItemPos) -> {
+            actualPage++;
+            loadNewPage(actualPage);
+        }, 10);
+
+        recyclerView.setRefreshListener(this::resetShots);
         toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
         imageRefresh.setOnClickListener(v -> resetShots());
 
@@ -94,29 +98,23 @@ public class MainActivity extends BaseActivity {
             intent.putExtra(BundleKeys.PHOTO_ID, photo.getId());
             startActivity(intent);
         });
+    }
 
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                refreshLayout.setEnabled(linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0);
-            }
-        });
+    private void loadInitialPage() {
+        compositeSubscription.add(flickrService.retrieveRecentPhotos(1).
+                subscribe(page -> {
+                    showEmptyView(false);
+                    photoAdapter.addPagePhotos(page);
+                    recyclerView.setAdapter(photoAdapter);
+                }, this::log));
     }
 
     private void loadNewPage(int pageNumber) {
         compositeSubscription.add(flickrService.retrieveRecentPhotos(pageNumber).
-                observeOn(AndroidSchedulers.mainThread()).
                 subscribe(page -> {
-                    showEmptyView(false);
+                    recyclerView.hideMoreProgress();
                     photoAdapter.addPagePhotos(page);
-                    cancelProgressDialog();
-                    if (refreshLayout.isEnabled()) {
-                        refreshLayout.setRefreshing(false);
-                    }
-                }, throwable -> {
-                    log(throwable);
-                    cancelProgressDialog();
-                }));
+                }, this::log));
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -127,17 +125,15 @@ public class MainActivity extends BaseActivity {
     }
 
     private void resetShots() {
-        showProgressDialog(R.string.loading_shots);
         photoAdapter.cleanShots();
         linearLayoutManager.scrollToPosition(0);
-        loadNewPage(1);
+        actualPage = 1;
+        loadNewPage(actualPage);
     }
 
     private void configureRecycleView() {
-        recyclerView.setHasFixedSize(true);
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(photoAdapter);
     }
 
     @Override
