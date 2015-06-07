@@ -43,8 +43,9 @@ android {
         applicationId "clertonleal.com.simpleflickr"
         minSdkVersion 10
         targetSdkVersion 22
-        versionCode 1
+        versionCode 2
         versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {

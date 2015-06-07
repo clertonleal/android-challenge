@@ -1,6 +1,7 @@
 package clertonleal.com.simpleflickr.activity;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -16,9 +17,11 @@ import javax.inject.Inject;
 import butterknife.InjectView;
 import clertonleal.com.simpleflickr.R;
 import clertonleal.com.simpleflickr.adapter.PhotoAdapter;
+import clertonleal.com.simpleflickr.entity.Photo;
 import clertonleal.com.simpleflickr.service.ConnectionService;
 import clertonleal.com.simpleflickr.service.FlickrService;
 import clertonleal.com.simpleflickr.util.BundleKeys;
+import clertonleal.com.simpleflickr.util.Flickr;
 import clertonleal.com.simpleflickr.util.FlickrPhotos;
 
 public class MainActivity extends BaseActivity {
@@ -68,6 +71,29 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private void configureRecycleView() {
+        linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setRefreshingColorResources(R.color.primary_color, R.color.primary_color,
+                                                    R.color.primary_color, R.color.primary_color);
+    }
+
+    private void configureToolbar() {
+        toolbar.inflateMenu(R.menu.main_menu);
+        toolbar.setTitle(R.string.app_name);
+    }
+
+    private void setListeners() {
+        recyclerView.setupMoreListener(this::onLoadMore, Flickr.LOAD_MORE_PHOTOS);
+        recyclerView.setRefreshListener(this::loadInitialPage);
+        toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
+        photoAdapter.setOnPhotoClickListener(this::openPhotoDetail);
+        imageRefresh.setOnClickListener(v -> {
+            showEmptyView(false);
+            loadInitialPage();
+        });
+    }
+
     private void showEmptyView(boolean show) {
         if (show) {
             emptyView.setVisibility(View.VISIBLE);
@@ -78,29 +104,15 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void configureToolbar() {
-        toolbar.inflateMenu(R.menu.main_menu);
-        toolbar.setTitle(R.string.app_name);
+    private void openPhotoDetail(Photo photo) {
+        final Intent intent = new Intent(this, PhotoActivity.class);
+        intent.putExtra(BundleKeys.PHOTO_ID, photo.getId());
+        startActivity(intent);
     }
 
-    private void setListeners() {
-        recyclerView.setupMoreListener((int numberOfItems, int numberBeforeMore, int currentItemPos) -> {
-            actualPage++;
-            loadNewPage(actualPage);
-        }, 10);
-
-        recyclerView.setRefreshListener(this::loadInitialPage);
-        toolbar.setOnMenuItemClickListener(this::onOptionsItemSelected);
-        imageRefresh.setOnClickListener(v -> {
-            showEmptyView(false);
-            loadInitialPage();
-        });
-
-        photoAdapter.setOnPhotoClickListener(photo -> {
-            final Intent intent = new Intent(this, PhotoActivity.class);
-            intent.putExtra(BundleKeys.PHOTO_ID, photo.getId());
-            startActivity(intent);
-        });
+    private void onLoadMore(int numberOfItems, int numberBeforeMore, int currentItemPos) {
+        actualPage++;
+        loadNewPage(actualPage);
     }
 
     private void loadInitialPage() {
@@ -134,11 +146,6 @@ public class MainActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void configureRecycleView() {
-        linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
     }
 
     @Override

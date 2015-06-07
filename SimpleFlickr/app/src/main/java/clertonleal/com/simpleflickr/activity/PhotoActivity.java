@@ -69,15 +69,15 @@ public class PhotoActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String photoId = getBundle().getString(BundleKeys.PHOTO_ID);
         configureRecycleView();
-        layoutPhoto.setVisibility(View.GONE);
+        showProgress();
+        String photoId = getBundle().getString(BundleKeys.PHOTO_ID);
 
         compositeSubscription.add(flickrService.retrievePhoto(photoId).
                 subscribe(photo -> {
                     showPhoto(photo);
                     configureToolbar(photo);
-                    setClickListeners(photo);
+                    setListeners(photo);
                     layoutPhoto.setVisibility(View.VISIBLE);
                 }, this::onError));
 
@@ -85,17 +85,23 @@ public class PhotoActivity extends BaseActivity {
                 subscribe(this::showComments, this::onError));
     }
 
+    private void showProgress() {
+        layoutPhoto.setVisibility(View.GONE);
+    }
+
     private void onError(Throwable throwable) {
         Toast.makeText(this, R.string.need_internet_to_see_photos, Toast.LENGTH_LONG).show();
         finish();
     }
 
-    private void setClickListeners(PhotoDetails photo) {
-        imagePhoto.setOnClickListener(v -> {
-            Intent intent = new Intent(this, PhotoZoomActivity.class);
-            intent.putExtra(BundleKeys.PHOTO_URL, photo.getLargePhotoUrl());
-            startActivity(intent);
-        });
+    private void setListeners(PhotoDetails photo) {
+        imagePhoto.setOnClickListener(v -> openZoomPhotoActivity(photo));
+    }
+
+    private void openZoomPhotoActivity(PhotoDetails photo) {
+        Intent intent = new Intent(this, PhotoZoomActivity.class);
+        intent.putExtra(BundleKeys.PHOTO_URL, photo.getLargePhotoUrl());
+        startActivity(intent);
     }
 
     private void configureRecycleView() {
